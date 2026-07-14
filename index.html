@@ -664,9 +664,12 @@
       if (!value) return;
 
       const tokens = tokenizeBusinessName(value);
-      // 반복 표기 여부는 전체 표기 길이로 판단한다.
-      // 괄호는 각각 0.5자로 계산하므로 "(주)크린랩"은 5자로 처리되어 반복되지 않는다.
-      const isShortName = weightedLength(value) <= 3;
+
+// "(주)"를 제외한 실제 상호명만 계산
+const businessOnly = value.replace(/\(주\)/g, "").trim();
+const businessLength = [...businessOnly].length;
+
+const isShortName = businessLength <= 3;
       const markPosition = selectedValue("markPosition");
 
       // 비표 주변에는 고정 여백을 두고, 나머지 원주에 글자를 균등 배치한다.
