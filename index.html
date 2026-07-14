@@ -663,13 +663,8 @@
       outerTextGroup.replaceChildren();
       if (!value) return;
 
-      const tokens = tokenizeBusinessName(value);
-
-// "(주)"를 제외한 실제 상호명만 계산
-const businessOnly = value.replace(/\(주\)/g, "").trim();
-const businessLength = [...businessOnly].length;
-
-const isShortName = businessLength <= 3;
+     const tokens = tokenizeBusinessName(value);
+const isShortName = weightedLength(value) <= 3;
       const markPosition = selectedValue("markPosition");
 
       // 비표 주변에는 고정 여백을 두고, 나머지 원주에 글자를 균등 배치한다.
