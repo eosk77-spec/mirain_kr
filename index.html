@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>인감도장 인면 옵션 주문</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --text: #191c20;
+      --muted: #6b7280;
+      --line: #dfe3e8;
+      --accent: #d93b36;
+      --accent-soft: #fff0ef;
+      --danger: #c62828;
+      --shadow: 0 14px 40px rgba(20, 28, 40, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .page {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .header {
+      margin-bottom: 22px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      letter-spacing: -0.04em;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.95fr) minmax(380px, 1.05fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid #eceff2;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .preview-panel {
+      position: sticky;
+      top: 18px;
+      min-height: 690px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .section-label {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .section-label h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .live-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+    }
+
+    .seal-wrap {
+      width: min(100%, 500px);
+      aspect-ratio: 1 / 1;
+      display: grid;
+      place-items: center;
+      margin: auto 0;
+      background:
+        radial-gradient(circle at center, #fff 0 58%, #faf7f6 59% 100%);
+      border-radius: 50%;
+    }
+
+    .seal-svg {
+      width: 92%;
+      height: 92%;
+      overflow: visible;
+    }
+
+    .seal-stroke {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 12;
+    }
+
+    .seal-stroke.inner {
+      stroke-width: 6;
+    }
+
+    .outer-text,
+    .center-text,
+    .mark-text {
+      fill: var(--accent);
+      font-family: "Noto Serif KR", "Batang", serif;
+      font-weight: 800;
+    }
+
+    .outer-text {
+      font-size: 35px;
+      letter-spacing: 1px;
+    }
+
+    .outer-font-jeonseo {
+      font-family: "전서체", "한글전서체", "Noto Serif KR", "Batang", serif;
+    }
+
+    .outer-font-goin {
+      font-family: "고인체", "한글고인체", "Noto Serif KR", "Batang", serif;
+    }
+
+    .outer-font-yeseo {
+      font-family: "예서체", "한글예서체", "Noto Serif KR", "Batang", serif;
+    }
+
+    .center-grid-text {
+      fill: var(--accent);
+      font-family: "Noto Serif KR", "Batang", serif;
+      font-weight: 800;
+      font-size: 48px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .mark-text {
+      font-size: 38px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .preview-note {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      background: #f8f9fb;
+      border-radius: 14px;
+    }
+
+    .form-panel {
+      padding: 28px;
+    }
+
+    .form-section + .form-section {
+      margin-top: 30px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    .form-section h2 {
+      margin: 0 0 18px;
+      font-size: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .field:last-child { margin-bottom: 0; }
+
+    label, legend {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .required::after {
+      content: " *";
+      color: var(--accent);
+    }
+
+    input, select {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(217, 59, 54, 0.10);
+    }
+
+    .helper-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .counter.invalid {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .option-group {
+      border: 0;
+      padding: 0;
+      margin: 0 0 18px;
+    }
+
+    .option-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .position-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .choice {
+      position: relative;
+    }
+
+    .choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .choice label {
+      min-height: 50px;
+      padding: 10px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      background: #fff;
+    }
+
+    .choice input:checked + label {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .mark-symbol {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .summary {
+      background: #f8f9fb;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .summary strong {
+      display: inline-block;
+      min-width: 112px;
+    }
+
+    .submit {
+      width: 100%;
+      height: 54px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .submit:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: -6px;
+    }
+
+    @media (max-width: 920px) {
+      .layout { grid-template-columns: 1fr; }
+      .preview-panel {
+        position: static;
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page { padding: 18px 12px 36px; }
+      .panel { border-radius: 16px; }
+      .preview-panel, .form-panel { padding: 20px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .option-list { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>인감도장 인면 옵션 주문</h1>
+      <p>표기 내용을 입력하면 왼쪽 인면 미리보기에 실시간으로 반영됩니다.</p>
+    </header>
+
+    <div class="layout">
+      <section class="panel preview-panel" aria-label="도장 인면 실시간 미리보기">
+        <div class="section-label">
+          <h2>인면 미리보기</h2>
+          <span class="live-badge">LIVE PREVIEW</span>
+        </div>
+
+        <div class="seal-wrap">
+          <svg class="seal-svg" viewBox="0 0 500 500" role="img" aria-label="도장 인면 미리보기">
+            <circle cx="250" cy="250" r="210" class="seal-stroke" />
+            <circle cx="250" cy="250" r="112" class="seal-stroke inner" />
+
+            <g id="outerTextGroup" aria-label="바깥쪽 원 표기"></g>
+
+            <g id="centerGrid" aria-label="가운데 인면 표기">
+              <text id="centerTL" class="center-grid-text" x="220" y="232">代</text>
+              <text id="centerTR" class="center-grid-text" x="280" y="232">表</text>
+              <text id="centerBL" class="center-grid-text" x="220" y="292">理</text>
+              <text id="centerBR" class="center-grid-text" x="280" y="292">事</text>
+            </g>
+            <text id="markText" class="mark-text" x="250" y="78">●</text>
+          </svg>
+        </div>
+
+        <div class="preview-note">
+          실제 제작 시 서체, 글자 간격, 획 굵기 및 원형 배치는 제조 규격에 맞게 보정될 수 있습니다.
+          상호명이 3자 이내이면 비표를 기준으로 좌·우에 반복 표기됩니다.
+        </div>
+      </section>
+
+      <form class="panel form-panel" id="orderForm" novalidate>
+        <section class="form-section">
+          <h2>1. 주문자 정보</h2>
+          <div class="grid-2">
+            <div class="field">
+              <label class="required" for="customerName">주문자명</label>
+              <input id="customerName" name="customerName" type="text" placeholder="홍길동" autocomplete="name" />
+            </div>
+            <div class="field">
+              <label class="required" for="phone">연락처</label>
+              <input id="phone" name="phone" type="tel" placeholder="010-0000-0000" autocomplete="tel" />
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>2. 가운데 인면 표기</h2>
+          <div class="field">
+            <label class="required" for="centerOption">표기 옵션</label>
+            <select id="centerOption" name="centerOption">
+              <option value="代表理事" data-label="대표이사">A. 代表理事 · 법인사업자</option>
+              <option value="代表之印" data-label="대표지인">B. 代表之印 · 개인사업자</option>
+              <option value="custom" data-label="직접 입력">C. 직접 입력</option>
+            </select>
+          </div>
+
+          <div class="field hidden" id="customCenterField">
+            <label class="required" for="customCenter">직접 입력 내용</label>
+            <input id="customCenter" name="customCenter" type="text" maxlength="4" placeholder="최대 4글자" />
+            <div class="helper-row">
+              <span>한글·영문·숫자 포함 최대 4글자</span>
+              <span id="centerCounter">0 / 4</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>3. 바깥쪽 원 표기</h2>
+          <div class="field">
+            <label class="required" for="businessName">사업자명 또는 상호명</label>
+            <input id="businessName" name="businessName" type="text" value="(주)크린랩" placeholder="예: (주)크린랩" />
+            <div class="helper-row">
+              <span>최대 8자 · 괄호 ( )는 각각 0.5자로 계산</span>
+              <span id="businessCounter" class="counter">0 / 8</span>
+            </div>
+            <div id="businessError" class="error hidden">허용 글자 수를 초과했습니다.</div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>4. 테두리 서체</h2>
+          <fieldset class="option-group">
+            <legend class="required">바깥쪽 원 서체 선택</legend>
+            <div class="option-list" style="grid-template-columns: repeat(3, 1fr);">
+              <div class="choice">
+                <input id="fontJeonseo" type="radio" name="outerFont" value="jeonseo" checked />
+                <label for="fontJeonseo">전서체</label>
+              </div>
+              <div class="choice">
+                <input id="fontGoin" type="radio" name="outerFont" value="goin" />
+                <label for="fontGoin">고인체</label>
+              </div>
+              <div class="choice">
+                <input id="fontYeseo" type="radio" name="outerFont" value="yeseo" />
+                <label for="fontYeseo">예서체</label>
+              </div>
+            </div>
+          </fieldset>
+          <div class="helper-row">
+            <span>동일한 폰트가 설치되어 있거나 웹폰트 파일이 연결된 경우 실제 서체로 표시됩니다.</span>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>5. 비표 설정</h2>
+
+          <fieldset class="option-group">
+            <legend class="required">비표 모양</legend>
+            <div class="option-list">
+              <div class="choice">
+                <input id="markCircle" type="radio" name="markShape" value="●" checked />
+                <label for="markCircle"><span class="mark-symbol">●</span>동그라미</label>
+              </div>
+              <div class="choice">
+                <input id="markDiamond" type="radio" name="markShape" value="◆" />
+                <label for="markDiamond"><span class="mark-symbol">◆</span>마름모</label>
+              </div>
+              <div class="choice">
+                <input id="markStar" type="radio" name="markShape" value="★" />
+                <label for="markStar"><span class="mark-symbol">★</span>별</label>
+              </div>
+              <div class="choice">
+                <input id="markTriangle" type="radio" name="markShape" value="▲" />
+                <label for="markTriangle"><span class="mark-symbol">▲</span>세모</label>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="option-group">
+            <legend class="required">비표 위치</legend>
+            <div class="option-list position-list">
+              <div class="choice">
+                <input id="positionTop" type="radio" name="markPosition" value="top" checked />
+                <label for="positionTop">가운데 위</label>
+              </div>
+              <div class="choice">
+                <input id="positionBottom" type="radio" name="markPosition" value="bottom" />
+                <label for="positionBottom">가운데 아래</label>
+              </div>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="form-section">
+          <h2>6. 주문내용 확인</h2>
+          <div class="summary" id="summary">
+            <div><strong>주문자</strong><span id="summaryCustomer">-</span></div>
+            <div><strong>연락처</strong><span id="summaryPhone">-</span></div>
+            <div><strong>가운데 인면</strong><span id="summaryCenter">대표이사</span></div>
+            <div><strong>바깥 원 표기</strong><span id="summaryBusiness">(주)크린랩</span></div>
+            <div><strong>테두리 서체</strong><span id="summaryFont">전서체</span></div>
+            <div><strong>비표</strong><span id="summaryMark">동그라미 · 가운데 위</span></div>
+          </div>
+          <button class="submit" id="submitButton" type="submit">제출하기</button>
+          <div id="submitStatus" aria-live="polite" style="margin-top:12px;font-size:14px;line-height:1.5;"></div>
+        </section>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("orderForm");
+    const customerName = document.getElementById("customerName");
+    const phone = document.getElementById("phone");
+    const centerOption = document.getElementById("centerOption");
+    const customCenterField = document.getElementById("customCenterField");
+    const customCenter = document.getElementById("customCenter");
+    const centerCounter = document.getElementById("centerCounter");
+    const businessName = document.getElementById("businessName");
+    const businessCounter = document.getElementById("businessCounter");
+    const businessError = document.getElementById("businessError");
+    const submitButton = document.getElementById("submitButton");
+    const submitStatus = document.getElementById("submitStatus");
+
+    // Google Apps Script를 웹 앱으로 배포한 뒤 생성된 URL을 아래에 붙여넣으세요.
+    const APPS_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+    const centerTL = document.getElementById("centerTL");
+    const centerTR = document.getElementById("centerTR");
+    const centerBL = document.getElementById("centerBL");
+    const centerBR = document.getElementById("centerBR");
+    const outerTextGroup = document.getElementById("outerTextGroup");
+    const markText = document.getElementById("markText");
+
+    const summaryCustomer = document.getElementById("summaryCustomer");
+    const summaryPhone = document.getElementById("summaryPhone");
+    const summaryCenter = document.getElementById("summaryCenter");
+    const summaryBusiness = document.getElementById("summaryBusiness");
+    const summaryFont = document.getElementById("summaryFont");
+    const summaryMark = document.getElementById("summaryMark");
+
+    const markNames = {
+      "●": "동그라미",
+      "◆": "마름모",
+      "★": "별",
+      "▲": "세모"
+    };
+
+    function weightedLength(value) {
+      return [...value].reduce((total, char) => {
+        return total + ((char === "(" || char === ")") ? 0.5 : 1);
+      }, 0);
+    }
+
+    function selectedValue(name) {
+      return document.querySelector(`input[name="${name}"]:checked`).value;
+    }
+
+    function normalizedBusinessText(value) {
+      return value.trim().replace(/\s+/g, " ");
+    }
+
+    function setCenterGrid(value) {
+      const chars = [...value].slice(0, 4);
+      while (chars.length < 4) chars.push("");
+
+      centerTL.textContent = chars[0] || "";
+      centerTR.textContent = chars[1] || "";
+      centerBL.textContent = chars[2] || "";
+      centerBR.textContent = chars[3] || "";
+    }
+
+    function updateCenter() {
+      const isCustom = centerOption.value === "custom";
+      customCenterField.classList.toggle("hidden", !isCustom);
+
+      let value;
+      if (isCustom) {
+        value = customCenter.value.trim() || "직접";
+      } else {
+        value = centerOption.value;
+      }
+
+      // 대표이사 → 代表理事, 대표지인 → 代表之印
+      const gridValue =
+        value === "代表理事" ? "代表理事" :
+        value === "代表之印" ? "代表之印" :
+        value;
+
+      setCenterGrid(gridValue);
+      centerCounter.textContent = `${[...customCenter.value].length} / 4`;
+
+      const selectedOption = centerOption.options[centerOption.selectedIndex];
+      summaryCenter.textContent = isCustom
+        ? value
+        : `${selectedOption.dataset.label} · ${value}`;
+    }
+
+    function tokenizeBusinessName(value) {
+      const tokens = [];
+      for (let i = 0; i < value.length; i++) {
+        if (value.slice(i, i + 3) === "(주)") {
+          tokens.push("(주)");
+          i += 2;
+        } else if (value[i] !== " ") {
+          tokens.push(value[i]);
+        }
+      }
+      return tokens;
+    }
+
+    function polarPoint(cx, cy, radius, angleDeg) {
+      const rad = (angleDeg - 90) * Math.PI / 180;
+      return {
+        x: cx + radius * Math.cos(rad),
+        y: cy + radius * Math.sin(rad)
+      };
+    }
+
+    function addOuterToken(token, angle) {
+      const point = polarPoint(250, 250, 163, angle);
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", point.x.toFixed(2));
+      text.setAttribute("y", point.y.toFixed(2));
+      text.setAttribute("text-anchor", "middle");
+      text.setAttribute("dominant-baseline", "middle");
+      text.setAttribute("class", "outer-text");
+      text.setAttribute("transform", `rotate(${angle} ${point.x.toFixed(2)} ${point.y.toFixed(2)})`);
+      if (token === "(주)") text.setAttribute("font-size", "27");
+      text.textContent = token;
+      outerTextGroup.appendChild(text);
+    }
+
+    function distributeTokens(tokens, startAngle, endAngle) {
+      if (!tokens.length) return;
+      if (tokens.length === 1) {
+        addOuterToken(tokens[0], (startAngle + endAngle) / 2);
+        return;
+      }
+
+      tokens.forEach((token, index) => {
+        const angle = startAngle + ((endAngle - startAngle) * index / (tokens.length - 1));
+        addOuterToken(token, angle);
+      });
+    }
+
+    function renderOuterText(value) {
+      outerTextGroup.replaceChildren();
+      if (!value) return;
+
+      const tokens = tokenizeBusinessName(value);
+      // 반복 표기 여부는 전체 표기 길이로 판단한다.
+      // 괄호는 각각 0.5자로 계산하므로 "(주)크린랩"은 5자로 처리되어 반복되지 않는다.
+      const isShortName = weightedLength(value) <= 3;
+      const markPosition = selectedValue("markPosition");
+
+      // 비표 주변에는 고정 여백을 두고, 나머지 원주에 글자를 균등 배치한다.
+      if (isShortName) {
+        // 짧은 상호명은 비표 기준 좌우에 동일하게 반복 표기
+        if (markPosition === "top") {
+          distributeTokens(tokens, 292, 338);
+          distributeTokens(tokens, 22, 68);
+        } else {
+          distributeTokens(tokens, 112, 158);
+          distributeTokens(tokens, 202, 248);
+        }
+      } else {
+        if (markPosition === "top") {
+          distributeTokens(tokens, 42, 318);
+        } else {
+          distributeTokens(tokens, -138, 138);
+        }
+      }
+    }
+
+    function updateBusiness() {
+      const value = normalizedBusinessText(businessName.value);
+      const length = weightedLength(value);
+      const invalid = length > 8;
+
+      businessCounter.textContent = `${length} / 8`;
+      businessCounter.classList.toggle("invalid", invalid);
+      businessError.classList.toggle("hidden", !invalid);
+
+      renderOuterText(value);
+      summaryBusiness.textContent = value || "-";
+      validate();
+    }
+
+    const outerFontNames = {
+      jeonseo: "전서체",
+      goin: "고인체",
+      yeseo: "예서체"
+    };
+
+    function updateOuterFont() {
+      const fontValue = selectedValue("outerFont");
+      outerTextGroup.classList.remove(
+        "outer-font-jeonseo",
+        "outer-font-goin",
+        "outer-font-yeseo"
+      );
+      outerTextGroup.classList.add(`outer-font-${fontValue}`);
+      summaryFont.textContent = outerFontNames[fontValue];
+    }
+
+    function updateMark() {
+      const shape = selectedValue("markShape");
+      const position = selectedValue("markPosition");
+
+      markText.textContent = shape;
+      markText.setAttribute("y", position === "top" ? "78" : "422");
+
+      summaryMark.textContent =
+        `${markNames[shape]} · ${position === "top" ? "가운데 위" : "가운데 아래"}`;
+
+      renderOuterText(normalizedBusinessText(businessName.value));
+    }
+
+    function updateCustomer() {
+      summaryCustomer.textContent = customerName.value.trim() || "-";
+      summaryPhone.textContent = phone.value.trim() || "-";
+      validate();
+    }
+
+    function validate() {
+      const centerValid = centerOption.value !== "custom" || customCenter.value.trim().length > 0;
+      const businessValid =
+        businessName.value.trim().length > 0 &&
+        weightedLength(normalizedBusinessText(businessName.value)) <= 8;
+
+      const customerValid = customerName.value.trim().length > 0;
+      const phoneValid = phone.value.trim().length >= 9;
+
+      submitButton.disabled = !(centerValid && businessValid && customerValid && phoneValid);
+    }
+
+    centerOption.addEventListener("change", () => {
+      updateCenter();
+      validate();
+    });
+
+    customCenter.addEventListener("input", () => {
+      customCenter.value = [...customCenter.value].slice(0, 4).join("");
+      updateCenter();
+      validate();
+    });
+
+    businessName.addEventListener("input", updateBusiness);
+    customerName.addEventListener("input", updateCustomer);
+    phone.addEventListener("input", updateCustomer);
+
+    document.querySelectorAll('input[name="markShape"], input[name="markPosition"]')
+      .forEach(input => input.addEventListener("change", updateMark));
+
+    document.querySelectorAll('input[name="outerFont"]')
+      .forEach(input => input.addEventListener("change", updateOuterFont));
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (submitButton.disabled) return;
+
+      if (APPS_SCRIPT_URL.includes("PASTE_YOUR")) {
+        submitStatus.textContent = "Google Apps Script 웹 앱 URL을 먼저 입력해주세요.";
+        submitStatus.style.color = "#c62828";
+        return;
+      }
+
+      const selectedCenterOption = centerOption.options[centerOption.selectedIndex];
+      const centerValue = centerOption.value === "custom"
+        ? customCenter.value.trim()
+        : centerOption.value;
+
+      const payload = new URLSearchParams({
+        customerName: customerName.value.trim(),
+        phone: phone.value.trim(),
+        centerLabel: centerOption.value === "custom"
+          ? "직접 입력"
+          : selectedCenterOption.dataset.label,
+        centerText: centerValue,
+        businessName: normalizedBusinessText(businessName.value),
+        outerFont: outerFontNames[selectedValue("outerFont")],
+        markShape: markNames[selectedValue("markShape")],
+        markPosition: selectedValue("markPosition") === "top"
+          ? "가운데 위"
+          : "가운데 아래",
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent
+      });
+
+      submitButton.disabled = true;
+      submitButton.textContent = "전송 중...";
+      submitStatus.textContent = "주문 내용을 전송하고 있습니다.";
+      submitStatus.style.color = "#6b7280";
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: payload.toString()
+        });
+
+        submitStatus.textContent = "주문 내용이 제출되었습니다. 담당자 확인 후 연락드리겠습니다.";
+        submitStatus.style.color = "#1b7f3a";
+        submitButton.textContent = "제출 완료";
+      } catch (error) {
+        submitStatus.textContent = "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        submitStatus.style.color = "#c62828";
+        submitButton.disabled = false;
+        submitButton.textContent = "제출하기";
+      }
+    });
+
+    updateCenter();
+    updateBusiness();
+    updateOuterFont();
+    updateMark();
+    updateCustomer();
+  </script>
+</body>
+</html>
