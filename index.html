@@ -613,14 +613,25 @@
 
     function tokenizeBusinessName(value) {
       const tokens = [];
+
       for (let i = 0; i < value.length; i++) {
-        if (value.slice(i, i + 3) === "(주)") {
-          tokens.push("(주)");
+        // "(주)", "(유)"처럼 괄호 안 한 글자로 된 법인 표기는
+        // 세 글자를 하나의 토큰으로 묶어서 처리한다.
+        const possibleCompanyMark = value.slice(i, i + 3);
+        const isCompanyMark =
+          possibleCompanyMark.length === 3 &&
+          possibleCompanyMark[0] === "(" &&
+          possibleCompanyMark[2] === ")" &&
+          possibleCompanyMark[1] !== " ";
+
+        if (isCompanyMark) {
+          tokens.push(possibleCompanyMark);
           i += 2;
         } else if (value[i] !== " ") {
           tokens.push(value[i]);
         }
       }
+
       return tokens;
     }
 
@@ -641,7 +652,7 @@
       text.setAttribute("dominant-baseline", "middle");
       text.setAttribute("class", "outer-text");
       text.setAttribute("transform", `rotate(${angle} ${point.x.toFixed(2)} ${point.y.toFixed(2)})`);
-      if (token === "(주)") text.setAttribute("font-size", "27");
+      if (/^\(.\)$/.test(token)) text.setAttribute("font-size", "27");
       text.textContent = token;
       outerTextGroup.appendChild(text);
     }
@@ -664,29 +675,30 @@
       if (!value) return;
 
       const tokens = tokenizeBusinessName(value);
-      const hasCorporationMark = tokens.includes("(주)");
-      const businessTokens = tokens.filter(token => token !== "(주)");
+      const companyMark = tokens.find(token => /^\(.\)$/.test(token));
+      const businessTokens = tokens.filter(token => token !== companyMark);
 
-      // "(주)"를 제외한 실제 상호명 글자 수로 짧은 상호명을 판단한다.
+      // "(주)", "(유)" 등의 법인 표기를 제외한 실제 상호명 글자 수로
+      // 짧은 상호명 여부를 판단한다.
       const isShortName = businessTokens.length <= 3;
       const markPosition = selectedValue("markPosition");
 
-      // "(주)"가 포함된 3글자 이하 상호명은
-      // "(주)"를 중심축으로 한 번만 표기하고, 상호명은 좌우에 반복한다.
-      if (hasCorporationMark && isShortName) {
+      // 법인 표기가 포함된 3글자 이하 상호명은
+      // 법인 표기를 중심축으로 한 번만 표시하고 상호명은 좌우에 반복한다.
+      if (companyMark && isShortName) {
         // 비표와 "(주)"는 위·아래 중심축에 두고,
         // 반복되는 상호명은 좌우 원주에 동일한 각도 간격으로 배치한다.
         if (markPosition === "top") {
-          addOuterToken("(주)", 180);
+          addOuterToken(companyMark, 180);
 
-          // 위쪽 비표와 아래쪽 "(주)" 주변에 여백을 두고,
+          // 위쪽 비표와 아래쪽 법인 표기 주변에 여백을 두고,
           // 남은 좌우 원주에 같은 각도 간격으로 배치한다.
           distributeTokens(businessTokens, 38, 142);
           distributeTokens(businessTokens, 218, 322);
         } else {
-          addOuterToken("(주)", 0);
+          addOuterToken(companyMark, 0);
 
-          // 위쪽 "(주)"와 아래쪽 비표 주변에 동일한 여백을 둔다.
+          // 위쪽 법인 표기와 아래쪽 비표 주변에 동일한 여백을 둔다.
           distributeTokens(businessTokens, 38, 142);
           distributeTokens(businessTokens, 218, 322);
         }
